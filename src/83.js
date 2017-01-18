@@ -1,5 +1,5 @@
 'use strict';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import Euler from './Euler';
 import t from 'exectimer';
 const Tick = t.Tick;
@@ -11,9 +11,9 @@ const solutionMap5x5 = [
 [ 0 , 0 , 0 , 1 , 0 ],
 [ 0 , 0 , 0 , 1 , 1 ]];
 const solution5x5 = 2297;
-const solution = require('../data/solutions.json')['83'];
-console.log(solution5x5);
-console.log(solution);  // 425185
+// const solution = require('../data/solutions.json')['83'];
+// console.log(solution5x5);
+// console.log(solution);  // 425185
 /**
  * G = cost from A to square
  * H = extimated cost from square to B
@@ -56,9 +56,6 @@ export default class Euler83 extends Euler {
         this.weightMap = matrix;
         this.rows = matrix.length;
         this.cols = matrix[0].length;
-
-        // this.map = (new Array(this.rows)).fill((new Array(this.cols)).fill(0));
-        // this.map[0, 0] = 1;
 
         this.heuristicMap = [];
         for(let i = 0; i < this.rows; i++) {

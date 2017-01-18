@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @param {Number} limit=1000 - end of the sieve
  */

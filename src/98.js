@@ -1,7 +1,7 @@
 'use strict';
 // import fs from 'fs';
 // import path from 'path';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import Euler from './Euler';
 import t from 'exectimer';
 const Tick = t.Tick;
