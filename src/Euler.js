@@ -1,7 +1,7 @@
 // import microtime from 'microtime';
-const marky = require('marky/lib/marky.browser.es');
-const moment = require('moment');
-const t = require('exectimer');
+import * as marky from 'marky/lib/marky.browser.es';
+// import moment from 'moment';
+import t from './util/exectimer';
 // const Tick = t.Tick;
 
 // { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }

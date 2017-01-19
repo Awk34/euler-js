@@ -1,5 +1,5 @@
 import Euler from './Euler';
-import { Tick } from 'exectimer';
+import { Tick } from './util/exectimer';
 import { isPalindrome } from './util';
 
 export default class Euler4 extends Euler {

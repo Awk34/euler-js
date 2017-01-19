@@ -3,7 +3,7 @@
 // import path from 'path';
 import _ from 'lodash-es';
 import Euler from './Euler';
-import t from 'exectimer';
+import t from './util/exectimer';
 const Tick = t.Tick;
 import math from 'mathjs';
 // import {permute} from './util/array';

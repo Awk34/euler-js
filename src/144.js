@@ -2,7 +2,7 @@
 import Euler from './Euler';
 import quadratic from './util/quadratic';
 // import { decorate } from 'core-decorators';
-import t from 'exectimer';
+import t from './util/exectimer';
 const Tick = t.Tick;
 
 class Point {

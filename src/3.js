@@ -1,6 +1,6 @@
 'use strict';
 import Euler from './Euler';
-import t from 'exectimer';
+import t from './util/exectimer';
 const Tick = t.Tick;
 
 export default class Euler3 extends Euler {
