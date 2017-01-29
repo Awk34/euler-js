@@ -7,118 +7,122 @@ import co from 'co';
  */
 export const timers = {};
 
+class Timer {
+  ticks = [];
+
+  /**
+   * Get the median of all ticks.
+   * @returns {*}
+   */
+  median() {
+    if(this.ticks.length > 1) {
+      const sorted = this.ticks.slice(0).sort((a, b) => {
+        return a && b && (a.getDiff() - b.getDiff()) || 0;
+      });
+
+      const length = sorted.length;
+      const half = Math.floor(length / 2);
+
+      if(length % 2) {
+        return sorted[half].getDiff();
+      } else {
+        return (sorted[half - 1].getDiff() + sorted[half].getDiff()) / 2;
+      }
+    } else {
+      return this.ticks[0].getDiff();
+    }
+  }
+
+  /**
+   * Get the average duration of all ticks.
+   * @returns {number}
+   */
+  mean() {
+    return this.duration() / this.ticks.length;
+  }
+
+  /**
+   * Get the duration of all ticks.
+   * @returns {number}
+   */
+  duration() {
+    let sum = 0;
+    let length = this.ticks.length;
+    for(let i = 0; i < length; i++) {
+      sum += this.ticks[i].getDiff();
+    }
+    return sum;
+  }
+
+  /**
+   * Get the shortest tick.
+   * @returns {number}
+   */
+  min() {
+    let min = this.ticks[0].getDiff();
+
+    this.ticks.forEach(tick => {
+      if(tick.getDiff() < min) {
+        min = tick.getDiff();
+      }
+    });
+
+    return min;
+  }
+
+  /**
+   * Get the longest tick.
+   * @returns {number}
+   */
+  max() {
+    let max = 0;
+
+    this.ticks.forEach(tick => {
+      if(tick.getDiff() > max) {
+        max = tick.getDiff();
+      }
+    });
+
+    return max;
+  }
+
+  /**
+   * Get the number of ticks.
+   * @returns {Number}
+   */
+  count() {
+    return Object.keys(this.ticks).length;
+  }
+
+  /**
+   * Parse the numbers nicely.
+   * @param num
+   * @returns {string}
+   */
+  parse(num) {
+    if(num < 1e3) {
+      return num + 'ns';
+    } else if(num >= 1e3 && num < 1e6) {
+      return num / 1e3 + 'us';
+    } else if(num >= 1e6 && num < 1e9) {
+      return num / 1e6 + 'ms';
+    } else if(num >= 1e9) {
+      return num / 1e9 + 's';
+    }
+  }
+}
+
 /**
  * Timers factory object.
  * @param name
  * @returns {*}
  */
-export const timer = function (name) {
-    if (typeof timers[name] === 'undefined') {
-        timers[name] = {
-            ticks: [],
+export const timer = function(name) {
+  if(typeof timers[name] === 'undefined') {
+    timers[name] = new Timer();
+  }
 
-            /**
-             * Get the median of all ticks.
-             * @returns {*}
-             */
-            median() {
-                if (this.ticks.length > 1) {
-                    const sorted = this.ticks.slice(0).sort(function (a, b) {
-                        return a && b && (a.getDiff() - b.getDiff()) || 0;
-                    });
-
-                    const l = sorted.length;
-                    const half = Math.floor(l / 2);
-
-
-                    if (l % 2) {
-                        return sorted[half].getDiff();
-                    } else {
-                        return (sorted[half - 1].getDiff() + sorted[half].getDiff()) / 2;
-                    }
-                } else {
-                    return this.ticks[0].getDiff();
-                }
-            },
-
-            /**
-             * Get the average duration of all ticks.
-             * @returns {number}
-             */
-            mean() {
-                return this.duration() / this.ticks.length;
-            },
-
-            /**
-             * Get the duration of all ticks.
-             * @returns {number}
-             */
-            duration() {
-                let sum = 0;
-                for (let i = 0, l = this.ticks.length; i < l; i++) {
-                    sum += this.ticks[i].getDiff();
-                }
-                return sum;
-            },
-
-            /**
-             * Get the shortest tick.
-             * @returns {number}
-             */
-            min() {
-                let min = this.ticks[0].getDiff();
-                this.ticks.forEach(function (tick) {
-                    if (tick.getDiff() < min) {
-                        min = tick.getDiff();
-                    }
-                });
-
-                return min;
-            },
-
-            /**
-             * Get the longest tick.
-             * @returns {number}
-             */
-            max() {
-                let max = 0;
-                this.ticks.forEach(function (tick) {
-                    if (tick.getDiff() > max) {
-                        max = tick.getDiff();
-                    }
-                });
-
-                return max;
-            },
-
-            /**
-             * Get the number of ticks.
-             * @returns {Number}
-             */
-            count() {
-                return Object.keys(this.ticks).length;
-            },
-
-            /**
-             * Parse the numbers nicely.
-             * @param num
-             * @returns {string}
-             */
-            parse(num) {
-                if (num < 1e3) {
-                    return num + 'ns';
-                } else if (num >= 1e3 && num < 1e6) {
-                    return num / 1e3 + 'us';
-                } else if (num >= 1e6 && num < 1e9) {
-                    return num / 1e6 + 'ms';
-                } else if (num >= 1e9) {
-                    return num / 1e9 + 's';
-                }
-            }
-        };
-    }
-
-    return timers[name];
+  return timers[name];
 };
 
 export class Tick {
@@ -134,23 +138,23 @@ export class Tick {
   }
 
   static wrap(name, callback) {
-    if (typeof name === 'function') {
+    if(typeof name === 'function') {
       callback = name;
       name = functionName(callback);
     }
 
-    if (name === '') {
+    if(name === '') {
       name = 'anon';
     }
 
     const tick = new Tick(name);
     tick.start();
 
-    const done = function () {
+    const done = function() {
       tick.stop();
     };
 
-    if (isGeneratorFunction(callback)) {
+    if(isGeneratorFunction(callback)) {
       return co(callback).then(done, done);
     } else if(isFunction(callback)) {
       // If done is passed when the callback is declared than we assume is async
@@ -203,9 +207,9 @@ function envTimer(time) {
 }
 
 export default {
-    timer,
-    timers,
-    Tick
+  timer,
+  timers,
+  Tick
 };
 
 /**
@@ -214,10 +218,10 @@ export default {
  * @returns {string}
  */
 function functionName(fun) {
-    let ret = fun.toString();
-    ret = ret.substr('function '.length);
-    ret = ret.substr(0, ret.indexOf('('));
-    return ret.trim();
+  let ret = fun.toString();
+  ret = ret.substr('function '.length);
+  ret = ret.substr(0, ret.indexOf('('));
+  return ret.trim();
 }
 
 /**
@@ -228,7 +232,7 @@ function functionName(fun) {
  * @api private
  */
 function isGeneratorFunction(value) {
-    return typeof value === 'function' && value.constructor.name === 'GeneratorFunction';
+  return typeof value === 'function' && value.constructor.name === 'GeneratorFunction';
 }
 
 /**
@@ -238,10 +242,10 @@ function isGeneratorFunction(value) {
  * @returns {boolean}
  */
 function isFunction(value) {
-    // The use of `Object#toString` avoids issues with the `typeof` operator
-    // in Safari 9 which returns 'object' for typed array and other constructors.
-    var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
-    return tag == '[object Function]' || tag == '[object GeneratorFunction]' || tag == '[object Proxy]';
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
+  return tag == '[object Function]' || tag == '[object GeneratorFunction]' || tag == '[object Proxy]';
 }
 
 /**
@@ -251,6 +255,6 @@ function isFunction(value) {
  * @returns {boolean}
  */
 function isObject(value) {
-    var type = typeof value;
-    return value != null && (type == 'object' || type == 'function');
+  var type = typeof value;
+  return value != null && (type == 'object' || type == 'function');
 }
