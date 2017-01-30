@@ -3,54 +3,53 @@ import Euler from './Euler';
 import t from './util/exectimer';
 const Tick = t.Tick;
 
+export function isPrime(n) {
+    let i = 2;
+    let sqrtN = Math.sqrt(n).toFixed(0);
+
+    while(i <= sqrtN) {
+        if(n % i === 0) {
+            return false;
+        } else {
+            i++;
+        }
+    }
+
+    return true;
+}
+
 export default class Euler3 extends Euler {
-    fac = 2;
     num = 600851475143;
-    solution;
+    factors = [];
 
     constructor() {
         super();
     }
 
     *step() {
-        let sqrtNum = Math.sqrt(this.num).toFixed(0);
-        while(this.fac <= sqrtNum) {
+        let n = this.num;
+        let i = 2;
+
+        while(!isPrime(n) && n > 2) {
             let tick = new Tick('step');
             tick.start();
 
-            if(this.num % this.fac == 0) {
-                let otherFac = this.num / this.fac;
-                if(Euler3.isPrime(otherFac)) {
-                    this.solution = otherFac;
-                    tick.stop();
-                    return otherFac;
-                } else {
-                    if(Euler3.isPrime(this.fac)) {
-                        this.solution = this.fac;
-                    }
-                }
-            }
-
-            this.fac++;
-            tick.stop();
-            yield this.fac;
-        }
-
-        return this.solution;
-    }
-
-    static isPrime(n) {
-        let i = 2;
-        let sqrtN = Math.sqrt(n).toFixed(0);
-
-        while(i <= sqrtN) {
             if(n % i === 0) {
-                return false;
-            } else {
-                i++;
+                yield i;
+                this.factors.push(i);
+                n = n / i;
+                i = 2;
             }
+            i++;
+
+            tick.stop();
         }
 
-        return true;
+        this.factors.push(n);
+
+        if(this.factors.reduce((acc, x) => acc * x, 1) !== this.num) throw new Error('Something went terribly wrong!');
+
+        this.solution = n;
+        return this.solution;
     }
 }
